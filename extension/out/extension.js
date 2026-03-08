@@ -1,0 +1,33 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.activate = activate;
+exports.deactivate = deactivate;
+const vscode = require("vscode");
+const child_process_1 = require("child_process");
+const path = require("path");
+function activate(context) {
+    let disposable = vscode.commands.registerCommand('bugshield.scanProject', () => {
+        var _a;
+        const output = vscode.window.createOutputChannel("BugShield");
+        output.show();
+        output.appendLine("🔍 BugShield scanning project...");
+        const workspaceFolder = (_a = vscode.workspace.workspaceFolders) === null || _a === void 0 ? void 0 : _a[0].uri.fsPath;
+        if (!workspaceFolder) {
+            vscode.window.showErrorMessage("No workspace folder open.");
+            return;
+        }
+        const scannerPath = path.join(workspaceFolder, "scanner", "scanner.py");
+        (0, child_process_1.exec)(`python "${scannerPath}" "${workspaceFolder}"`, (error, stdout, stderr) => {
+            if (error) {
+                output.appendLine("❌ Scanner error:");
+                output.appendLine(stderr);
+                return;
+            }
+            output.appendLine("Scan Results:");
+            output.appendLine(stdout);
+        });
+    });
+    context.subscriptions.push(disposable);
+}
+function deactivate() { }
+//# sourceMappingURL=extension.js.map

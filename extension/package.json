@@ -1,0 +1,30 @@
+{
+  "name": "bugshield-extension",
+  "displayName": "BugShield AI",
+  "description": "Security scanner for detecting vulnerabilities and secrets in code",
+  "version": "0.0.1",
+  "publisher": "bugshield",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "bugshield.scanProject",
+        "title": "BugShield: Scan Project"
+      }
+    ]
+  },
+  "scripts": {
+    "compile": "tsc -p ./"
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.5",
+    "@types/vscode": "^1.80.0",
+    "typescript": "^5.0.0"
+  }
+}
