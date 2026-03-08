@@ -44,7 +44,7 @@ def scan_project(folder):
 
 if __name__ == "__main__":
 
-    project_path = sys.argv[1]
+    project_path = sys.argv[1] if len(sys.argv) > 1 else "."
 
     findings = scan_project(project_path)
 
