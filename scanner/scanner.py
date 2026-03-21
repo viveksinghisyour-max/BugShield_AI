@@ -12,7 +12,7 @@ def scan_project(project_path):
 
         for file in files:
 
-            if file.endswith((".py", ".js", ".ts", ".env")):
+            if file.endswith((".py", ".js", ".ts", ".env", ".yaml", ".yml", ".json", ".txt")):
 
                 file_path = os.path.join(root, file)
 
