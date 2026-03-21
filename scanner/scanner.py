@@ -37,3 +37,7 @@ if __name__ == "__main__":
     findings = scan_project(project_path)
 
     print(json.dumps(findings, indent=2))
+
+    total_issues = len(findings)
+    score = max(0, 100 - total_issues * 5)
+    print(f"\nSecurity Score: {score}/100")

@@ -70,7 +70,8 @@ def scan_file(file_path):
                         "file": file_path,
                         "line": line_number,
                         "issue": issue,
-                        "severity": "HIGH"
+                        "severity": "HIGH",
+                        "score": 9
                     })
 
             # Entropy detection
@@ -84,7 +85,8 @@ def scan_file(file_path):
                         "file": file_path,
                         "line": line_number,
                         "issue": "High Entropy Secret",
-                        "severity": "MEDIUM"
+                        "severity": "MEDIUM",
+                        "score": 6
                     })
 
     except Exception:
