@@ -2,6 +2,7 @@ import os
 import sys
 import json
 from secret_scanner import scan_file
+from dependency_scanner import scan_requirements
 
 
 def scan_project(project_path):
@@ -15,6 +16,10 @@ def scan_project(project_path):
             if file.endswith((".py", ".js", ".ts", ".env", ".yaml", ".yml", ".json", ".txt")):
 
                 file_path = os.path.join(root, file)
+
+                if file == "requirements.txt":
+                    issues = scan_requirements(file_path)
+                    results.extend(issues)
 
                 issues = scan_file(file_path)
 
