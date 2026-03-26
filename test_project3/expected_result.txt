@@ -1,0 +1,3 @@
+Path traversal
+Unrestricted upload
+Vulnerable dependencies

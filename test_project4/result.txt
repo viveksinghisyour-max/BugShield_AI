@@ -1,0 +1,3 @@
+Debug enabled
+Hardcoded DB credentials
+Secret in env file

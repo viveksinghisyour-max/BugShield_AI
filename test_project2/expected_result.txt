@@ -1,0 +1,4 @@
+Hardcoded credentials
+Weak authentication
+Weak secret key
+Vulnerable dependencies

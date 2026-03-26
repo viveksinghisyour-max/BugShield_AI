@@ -1,0 +1,7 @@
+app.py → Hardcoded password
+config.env → API key
+db.py → SQL Injection
+web.js → Command Injection
+app.py → Weak crypto
+requirements.txt → Vulnerable packages
+package.json → Vulnerable packages

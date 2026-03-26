@@ -1,0 +1,1 @@
+connection = "mysql://root:root@localhost/db"
