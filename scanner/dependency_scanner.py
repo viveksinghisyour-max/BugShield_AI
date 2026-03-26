@@ -63,7 +63,14 @@ def scan_requirements(file_path):
                     version
                 )
 
-                results.extend(vulnerabilities)
+                for v in vulnerabilities:
+                    results.append({
+                        "file": file_path,
+                        "line": line_number,
+                        "issue": f"Vulnerable package: {v['package']} {v['version']} (CVE: {v['cve']})",
+                        "severity": v["severity"],
+                        "score": v["score"]
+                    })
 
     except:
 

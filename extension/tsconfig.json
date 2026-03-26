@@ -7,8 +7,10 @@
     "sourceMap": true,
     "rootDir": "src",
     "strict": true,
-    "types": ["node"]
+    "types": ["node", "vscode"],
+    "forceConsistentCasingInFileNames": true
   },
+  "include": ["src/**/*"],
   "exclude": [
     "node_modules",
     ".vscode-test"

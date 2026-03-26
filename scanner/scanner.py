@@ -31,8 +31,8 @@ def scan_project(project_path):
 if __name__ == "__main__":
 
     if len(sys.argv) < 2:
-        # Default to test_project for easy testing
-        project_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test_project"))
+        # Default to test_project2 for easy testing
+        project_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test_project2"))
         if not os.path.exists(project_path):
             print(json.dumps([{"file": "scanner.py", "line": 0, "issue": "Missing project path argument", "severity": "HIGH"}], indent=2))
             sys.exit(1)
