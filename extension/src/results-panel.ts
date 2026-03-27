@@ -26,7 +26,7 @@ function getWebviewContent(results: string, securityScore: number): string {
 
         return `
         <tr>
-            <td>${item.file.split('\\').pop()}</td>
+            <td>${item.file.split(/[\\/]/).pop()}</td>
             <td>${item.line}</td>
             <td>${item.issue}</td>
             <td><span style="
