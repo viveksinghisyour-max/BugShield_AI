@@ -5,26 +5,49 @@ import { showResultsPanel } from './results-panel';
 
 export function activate(context: vscode.ExtensionContext) {
 
-    let disposable = vscode.commands.registerCommand('bugshield.scanProject', () => {
+    let disposable = vscode.commands.registerCommand('bugshield.scanProject', async () => {
 
         const output = vscode.window.createOutputChannel("BugShield");
         output.show();
         output.appendLine("🔍 BugShield scanning project...");
 
-        const workspaceFolder = vscode.workspace.workspaceFolders?.[0].uri.fsPath;
+        const extensionFolder = context.extensionPath;
+        const defaultScannerPath = path.join(extensionFolder, "..", "scanner", "scanner.py");
 
-        if (!workspaceFolder) {
-            vscode.window.showErrorMessage("No workspace folder open.");
+        let projectPath = vscode.workspace.workspaceFolders?.[0].uri.fsPath;
+
+        if (!projectPath || path.basename(projectPath).toLowerCase().includes("extension")) {
+            const selected = await vscode.window.showOpenDialog({
+                canSelectFiles: false,
+                canSelectFolders: true,
+                canSelectMany: false,
+                openLabel: "Select folder to scan"
+            });
+
+            if (!selected || selected.length === 0) {
+                vscode.window.showErrorMessage("No project folder selected for scanning.");
+                return;
+            }
+
+            projectPath = selected[0].fsPath;
+        }
+
+        const scannerPath = path.join(path.dirname(projectPath), "scanner", "scanner.py");
+        const resolvedScannerPath = (require('fs').existsSync(scannerPath) ? scannerPath : defaultScannerPath);
+
+        if (!require('fs').existsSync(resolvedScannerPath)) {
+            vscode.window.showErrorMessage(`Scanner script not found at ${resolvedScannerPath}.`);
             return;
         }
 
-        const scannerPath = path.join(workspaceFolder, "..", "scanner", "scanner.py");
+        const pythonCmd = process.env.PYTHON || process.env.PYTHONPATH || "python";
 
-        exec(`"C:\\Python314\\python.exe" "${scannerPath}" "${workspaceFolder}"`, (error: Error | null, stdout: string, stderr: string) => {
+        exec(`${pythonCmd} "${resolvedScannerPath}" "${projectPath}"`, (error: Error | null, stdout: string, stderr: string) => {
 
             if (error) {
                 output.appendLine("❌ Scanner error:");
-                output.appendLine(stderr);
+                output.appendLine(stderr || error.message);
+                vscode.window.showErrorMessage(`BugShield scan failed: ${error.message}`);
                 return;
             }
 
