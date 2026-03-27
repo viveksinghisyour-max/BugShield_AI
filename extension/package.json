@@ -15,9 +15,18 @@
     "commands": [
       {
         "command": "bugshield.scanProject",
-        "title": "BugShield: Scan Project"
+        "title": "Scan Project with BugShield",
+        "category": "BugShield"
       }
-    ]
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "bugshield.scanProject",
+          "group": "navigation"
+        }
+      ]
+    }
   },
   "scripts": {
     "compile": "tsc -p ./"

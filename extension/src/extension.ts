@@ -18,9 +18,9 @@ export function activate(context: vscode.ExtensionContext) {
             return;
         }
 
-        const scannerPath = path.join(workspaceFolder, "scanner", "scanner.py");
+        const scannerPath = path.join(workspaceFolder, "..", "scanner", "scanner.py");
 
-        exec(`python "${scannerPath}" "${workspaceFolder}"`, (error: Error | null, stdout: string, stderr: string) => {
+        exec(`"C:\\Python314\\python.exe" "${scannerPath}" "${workspaceFolder}"`, (error: Error | null, stdout: string, stderr: string) => {
 
             if (error) {
                 output.appendLine("❌ Scanner error:");
