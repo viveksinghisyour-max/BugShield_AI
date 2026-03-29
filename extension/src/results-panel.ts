@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-export function showResultsPanel(results: any[], securityScore: number) {
+export function showResultsPanel(results: any[], securityScore: number, workspaceFolder: string) {
     const panel = vscode.window.createWebviewPanel(
         'bugshieldResults',
         'BugShield Results',
@@ -9,6 +9,20 @@ export function showResultsPanel(results: any[], securityScore: number) {
     );
 
     panel.webview.html = getWebviewContent(JSON.stringify(results), securityScore);
+
+    // Webview se message receive karo
+    panel.webview.onDidReceiveMessage((message) => {
+        if (message.command === 'openFile') {
+            const fileUri = vscode.Uri.file(message.file);
+            vscode.window.showTextDocument(fileUri, {
+                selection: new vscode.Range(
+                    new vscode.Position(message.line - 1, 0),
+                    new vscode.Position(message.line - 1, 0)
+                ),
+                viewColumn: vscode.ViewColumn.One
+            });
+        }
+    });
 }
 
 function getWebviewContent(results: string, securityScore: number): string {
@@ -25,8 +39,9 @@ function getWebviewContent(results: string, securityScore: number): string {
                     : '#ffcc00';
 
         return `
-        <tr>
-            <td>${item.file.split(/[\\/]/).pop()}</td>
+        <tr onclick="openFile('${item.file.replace(/\\/g, '\\\\')}', ${item.line})" 
+            title="Click to open file">
+            <td>${item.file.split('\\').pop()}</td>
             <td>${item.line}</td>
             <td>${item.issue}</td>
             <td><span style="
@@ -63,6 +78,10 @@ function getWebviewContent(results: string, securityScore: number): string {
         <h1>🛡️ BugShield Security Report</h1>
         <div class="score">${securityScore}/100</div>
         <div class="score-label">Security Score</div>
+        <div style="margin-top:15px; margin-bottom:5px;">
+            <span style="font-size:24px; font-weight:bold; color:#ffffff;">${data.length}</span>
+            <span style="font-size:14px; color:#aaaaaa; margin-left:8px;">Total Issues Found</span>
+        </div>
         <table>
             <tr>
                 <th>File</th>
@@ -72,6 +91,13 @@ function getWebviewContent(results: string, securityScore: number): string {
             </tr>
             ${rows}
         </table>
+
+        <script>
+            const vscode = acquireVsCodeApi();
+            function openFile(file, line) {
+                vscode.postMessage({ command: 'openFile', file: file, line: line });
+            }
+        </script>
     </body>
     </html>`;
 }

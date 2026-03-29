@@ -39,7 +39,7 @@ export function activate(context: vscode.ExtensionContext) {
             output.appendLine(`Security Score: ${score}/100`);
 
             // Results panel kholo
-            showResultsPanel(results, score);
+            showResultsPanel(results, score, workspaceFolder);
         });
     });
 
