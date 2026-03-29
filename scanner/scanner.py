@@ -32,17 +32,21 @@ if __name__ == "__main__":
 
     if len(sys.argv) < 2:
         # Default to test_project2 for easy testing
-        project_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test_project2"))
-        if not os.path.exists(project_path):
+        project_paths = [os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test_project2"))]
+        if not os.path.exists(project_paths[0]):
             print(json.dumps([{"file": "scanner.py", "line": 0, "issue": "Missing project path argument", "severity": "HIGH"}], indent=2))
             sys.exit(1)
     else:
-        project_path = sys.argv[1]
+        project_paths = sys.argv[1:]
 
-    findings = scan_project(project_path)
+    all_findings = []
+    for project_path in project_paths:
+        if os.path.exists(project_path):
+            findings = scan_project(project_path)
+            all_findings.extend(findings)
 
-    print(json.dumps(findings, indent=2))
+    print(json.dumps(all_findings, indent=2))
 
-    total_issues = len(findings)
+    total_issues = len(all_findings)
     score = max(0, 100 - total_issues * 5)
     print(f"\nSecurity Score: {score}/100")

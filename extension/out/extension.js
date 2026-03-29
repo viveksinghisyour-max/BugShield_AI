@@ -16,35 +16,49 @@ const child_process_1 = require("child_process");
 const path = require("path");
 const results_panel_1 = require("./results-panel");
 function activate(context) {
-    let disposable = vscode.commands.registerCommand('bugshield.scanProject', () => __awaiter(this, void 0, void 0, function* () {
+    let disposable = vscode.commands.registerCommand('bugshield.scanProject', (uri, selectedUris) => __awaiter(this, void 0, void 0, function* () {
         var _a;
         const output = vscode.window.createOutputChannel("BugShield");
         output.show();
-        output.appendLine("🔍 BugShield scanning project...");
+        output.appendLine("🔍 BugShield scanning project(s)...");
         const extensionFolder = context.extensionPath;
         const defaultScannerPath = path.join(extensionFolder, "..", "scanner", "scanner.py");
-        let projectPath = (_a = vscode.workspace.workspaceFolders) === null || _a === void 0 ? void 0 : _a[0].uri.fsPath;
-        if (!projectPath || path.basename(projectPath).toLowerCase().includes("extension")) {
-            const selected = yield vscode.window.showOpenDialog({
-                canSelectFiles: false,
-                canSelectFolders: true,
-                canSelectMany: false,
-                openLabel: "Select folder to scan"
-            });
-            if (!selected || selected.length === 0) {
-                vscode.window.showErrorMessage("No project folder selected for scanning.");
-                return;
-            }
-            projectPath = selected[0].fsPath;
+        let projectPaths = [];
+        if (selectedUris && selectedUris.length > 0) {
+            projectPaths = selectedUris.map(u => u.fsPath);
         }
-        const scannerPath = path.join(path.dirname(projectPath), "scanner", "scanner.py");
+        else if (uri) {
+            projectPaths = [uri.fsPath];
+        }
+        else {
+            let singlePath = (_a = vscode.workspace.workspaceFolders) === null || _a === void 0 ? void 0 : _a[0].uri.fsPath;
+            if (!singlePath || path.basename(singlePath).toLowerCase().includes("extension")) {
+                const selected = yield vscode.window.showOpenDialog({
+                    canSelectFiles: false,
+                    canSelectFolders: true,
+                    canSelectMany: true,
+                    openLabel: "Select folders to scan"
+                });
+                if (!selected || selected.length === 0) {
+                    vscode.window.showErrorMessage("No project folders selected for scanning.");
+                    return;
+                }
+                projectPaths = selected.map(u => u.fsPath);
+            }
+            else {
+                projectPaths = [singlePath];
+            }
+        }
+        const primaryPath = projectPaths[0];
+        const scannerPath = path.join(path.dirname(primaryPath), "scanner", "scanner.py");
         const resolvedScannerPath = (require('fs').existsSync(scannerPath) ? scannerPath : defaultScannerPath);
         if (!require('fs').existsSync(resolvedScannerPath)) {
             vscode.window.showErrorMessage(`Scanner script not found at ${resolvedScannerPath}.`);
             return;
         }
         const pythonCmd = process.env.PYTHON || process.env.PYTHONPATH || "python";
-        (0, child_process_1.exec)(`${pythonCmd} "${resolvedScannerPath}" "${projectPath}"`, (error, stdout, stderr) => {
+        const targetArgs = projectPaths.map(p => `"${p}"`).join(" ");
+        (0, child_process_1.exec)(`${pythonCmd} "${resolvedScannerPath}" ${targetArgs}`, (error, stdout, stderr) => {
             if (error) {
                 output.appendLine("❌ Scanner error:");
                 output.appendLine(stderr || error.message);
