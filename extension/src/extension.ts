@@ -9,7 +9,7 @@ export function activate(context: vscode.ExtensionContext) {
 
         const output = vscode.window.createOutputChannel("BugShield");
         output.show();
-        output.appendLine("🔍 BugShield scanning project(s)...");
+        output.appendLine("🔍 BugShield scanning project...");
 
         const extensionFolder = context.extensionPath;
         const defaultScannerPath = path.join(extensionFolder, "..", "scanner", "scanner.py");
@@ -31,7 +31,7 @@ export function activate(context: vscode.ExtensionContext) {
                 });
 
                 if (!selected || selected.length === 0) {
-                    vscode.window.showErrorMessage("No project folders selected for scanning.");
+                    vscode.window.showErrorMessage("No project folders selected.");
                     return;
                 }
 
@@ -43,14 +43,14 @@ export function activate(context: vscode.ExtensionContext) {
 
         const primaryPath = projectPaths[0];
         const scannerPath = path.join(path.dirname(primaryPath), "scanner", "scanner.py");
-        const resolvedScannerPath = (require('fs').existsSync(scannerPath) ? scannerPath : defaultScannerPath);
+        const resolvedScannerPath = require('fs').existsSync(scannerPath) ? scannerPath : defaultScannerPath;
 
         if (!require('fs').existsSync(resolvedScannerPath)) {
-            vscode.window.showErrorMessage(`Scanner script not found at ${resolvedScannerPath}.`);
+            vscode.window.showErrorMessage(`Scanner not found at ${resolvedScannerPath}.`);
             return;
         }
 
-        const pythonCmd = process.env.PYTHON || process.env.PYTHONPATH || "python";
+        const pythonCmd = `"C:\\Python314\\python.exe"`;
         const targetArgs = projectPaths.map(p => `"${p}"`).join(" ");
 
         exec(`${pythonCmd} "${resolvedScannerPath}" ${targetArgs}`, (error: Error | null, stdout: string, stderr: string) => {
@@ -58,11 +58,9 @@ export function activate(context: vscode.ExtensionContext) {
             if (error) {
                 output.appendLine("❌ Scanner error:");
                 output.appendLine(stderr || error.message);
-                vscode.window.showErrorMessage(`BugShield scan failed: ${error.message}`);
                 return;
             }
 
-            // JSON aur Security Score alag karo
             const jsonMatch = stdout.match(/\[[\s\S]*\]/);
             const scoreMatch = stdout.match(/Security Score:\s*(\d+)/);
 
@@ -72,8 +70,7 @@ export function activate(context: vscode.ExtensionContext) {
             output.appendLine("✅ Scan complete!");
             output.appendLine(`Security Score: ${score}/100`);
 
-            // Results panel kholo
-            showResultsPanel(results, score, workspaceFolder);
+            showResultsPanel(results, score, primaryPath);
         });
     });
 
