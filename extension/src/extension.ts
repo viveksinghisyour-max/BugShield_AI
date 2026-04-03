@@ -50,7 +50,7 @@ export function activate(context: vscode.ExtensionContext) {
             return;
         }
 
-        const pythonCmd = `"C:\\Python314\\python.exe"`;
+        const pythonCmd = process.platform === 'win32' ? 'py -3' : 'python3';
         const targetArgs = projectPaths.map(p => `"${p}"`).join(" ");
 
         exec(`${pythonCmd} "${resolvedScannerPath}" ${targetArgs}`, (error: Error | null, stdout: string, stderr: string) => {
@@ -58,14 +58,25 @@ export function activate(context: vscode.ExtensionContext) {
             if (error) {
                 output.appendLine("❌ Scanner error:");
                 output.appendLine(stderr || error.message);
+                vscode.window.showErrorMessage("BugShield scanning failed. See output channel for details.");
                 return;
             }
 
-            const jsonMatch = stdout.match(/\[[\s\S]*\]/);
-            const scoreMatch = stdout.match(/Security Score:\s*(\d+)/);
+            let results = [];
+            let score = 100;
 
-            const results = jsonMatch ? JSON.parse(jsonMatch[0]) : [];
-            const score = scoreMatch ? parseInt(scoreMatch[1]) : 100;
+            try {
+                const jsonMatch = stdout.match(/\[[\s\S]*\]/);
+                const scoreMatch = stdout.match(/Security Score:\s*(\d+)/);
+
+                results = jsonMatch ? JSON.parse(jsonMatch[0]) : [];
+                score = scoreMatch ? parseInt(scoreMatch[1]) : 100;
+            } catch (parseErr) {
+                output.appendLine("❌ Error parsing scanner output:");
+                output.appendLine((parseErr as Error).message || String(parseErr));
+                vscode.window.showErrorMessage("BugShield scanner output parsing error. See output channel for details.");
+                return;
+            }
 
             output.appendLine("✅ Scan complete!");
             output.appendLine(`Security Score: ${score}/100`);
