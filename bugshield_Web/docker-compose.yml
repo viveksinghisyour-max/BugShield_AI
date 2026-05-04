@@ -1,0 +1,19 @@
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      BUGSHIELD_JWT_SECRET: "replace-this-before-production"
+      BUGSHIELD_FRONTEND_ORIGIN: "http://localhost:5173"
+    volumes:
+      - ./database:/app/database
+      - ./reports:/app/reports
+      - ./storage:/app/storage
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend

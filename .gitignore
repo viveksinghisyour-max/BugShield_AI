@@ -1,5 +1,35 @@
-
+# Dependencies
+node_modules/
+.venv/
+venv/
+env/
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+*.so
 
-extension/out/
+# Environments
+.env
+.env.*
+
+# Build/Output Directories
+out/
+dist/
+build/
+*.egg-info/
+
+# Logs and databases
+*.log
+*.sqlite3
+*.db
+
+# OS Files
+.DS_Store
+Thumbs.db
+.vscode-test/
+
+# Project-specific
+bugshield_Web/storage/
+bugshield_Web/backend/storage/
+bugshield_Web/reports/*
+!bugshield_Web/reports/.gitkeep

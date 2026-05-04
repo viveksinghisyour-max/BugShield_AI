@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: #020617;
+  font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
+}
+
+button,
+a {
+  transition: all 180ms ease;
+}
